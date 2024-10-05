@@ -7,15 +7,20 @@ export class MetricStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Prod
-    const messagesMetric = new MathExpression({
-      label: "",
-      expression: "SEARCH('{Messages,Author} MetricName=MessageCount', 'Sum', 86400)"
-    });
+      // Prod
+      const messagesMetric = new MathExpression({
+          label: "",
+          expression: "SEARCH('{Messages,Author} MetricName=MessageCount', 'Sum', 86400)"
+      });
 
       const forwardMetric = new MathExpression({
           label: "",
           expression: "SEARCH('{ForwardChannel,ChannelName} MetricName=ForwardCount', 'Sum', 2592000)"
+      });
+
+      const langMetric = new MathExpression({
+          label: "",
+          expression: "SEARCH('{Language,LanguageName} MetricName=LanguageCount', 'Sum', 86400)"
       });
 
     new Dashboard(this, "MessagesDashboard", {
@@ -30,8 +35,15 @@ export class MetricStack extends cdk.Stack {
             left: [messagesMetric]
         }),
         new GraphWidget({
-            title: "Forward count",
+            title: "Language rate",
             width: 12,
+            period: Duration.days(1),
+            statistic: 'Sum',
+            left: [langMetric]
+        }),
+        new GraphWidget({
+            title: "Forward count",
+            width: 24,
             period: Duration.days(30),
             statistic: 'Sum',
             view: GraphWidgetView.BAR,
