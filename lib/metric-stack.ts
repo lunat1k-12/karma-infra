@@ -23,6 +23,11 @@ export class MetricStack extends cdk.Stack {
           expression: "SEARCH('{Language,LanguageName} MetricName=LanguageCount', 'Sum', 86400)"
       });
 
+      const reactionMetric = new MathExpression({
+          label: "",
+          expression: "SEARCH('{Messages,ReactionAuthor} MetricName=ReactionCount', 'Sum', 86400)"
+      });
+
     new Dashboard(this, "MessagesDashboard", {
       dashboardName: "MessagesDashboard",
       defaultInterval: Duration.days(7),
@@ -40,6 +45,13 @@ export class MetricStack extends cdk.Stack {
             period: Duration.days(1),
             statistic: 'Sum',
             left: [langMetric]
+        }),
+        new GraphWidget({
+            title: "Message Reactions count",
+            width: 12,
+            period: Duration.days(1),
+            statistic: 'Sum',
+            left: [reactionMetric]
         }),
         new GraphWidget({
             title: "Forward count",
